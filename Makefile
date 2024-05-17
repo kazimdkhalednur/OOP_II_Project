@@ -7,8 +7,8 @@ lint:
 
 server:
 	sudo systemctl start postgresql.service
-	$(VENV)/python src/manage.py runserver
+	$(VENV)/python manage.py runserver
 
 update-database:
-	$(VENV)/python src/manage.py makemigrations
-	$(VENV)/python src/manage.py migrate
+	$(VENV)/python manage.py makemigrations
+	$(VENV)/python manage.py migrate
