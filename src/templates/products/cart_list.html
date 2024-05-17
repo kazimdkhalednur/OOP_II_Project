@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container mt-4" style="min-height: 70vh;">
+  <div class="table-responsive text-nowrap">
+    <div class="mb-4 fs-2 fw-bold">Order Summary</div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 1vw;">
+            <input type="checkbox" id="allCheck" checked="true">
+          </th>
+          <th scope="col" style="width: 1vw;">#</th>
+          <th scope="col" style="width: 30vw;">Title</th>
+          <th scope="col" style="width: 10vw;">Price</th>
+          <th scope="col" style="width: 10vw;">Quantity</th>
+          <th scope="col" style="width: 10vw;">Total Product Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cart in cart_list %}
+        <tr>
+          <td>
+            <a href="{{ cart.get_checked_url }}"></a>
+            <input type="checkbox" class="check">
+          </td>
+          <td>{{ forloop.counter }}</td>
+          <td><a href="{{ cart.product.get_url }}">{{ cart.product.title }}</a></td>
+          <td>
+            ৳{{ cart.product.price }}
+            {% if cart.product.has_discount %}
+            <s class="text-danger">৳{{ cart.product.discount_price }}</s>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ cart.get_remove_url }}"><i class="fas fa-minus mr-2"></i></a>
+            <span>{{ cart.quantity }}</span>
+            <a href="{{ cart.get_add_url }}"><i class="fas fa-plus ml-2"></i></a>
+          </td>
+          <td>
+            {% if cart.product.has_discount %}
+            ৳<span class="getCartTotal">{{ cart.get_total }}</span>
+            <span class="badge badge-primary">Saving ৳{{ cart.get_amount_saved }}</span>
+            {% else %}
+            ৳<span class="getCartTotal">{{ cart.get_total }}</span>
+            {% endif %}
+            <a style='color: red;' href="{{ cart.get_delete_url }}">
+              <i class="fas fa-trash float-right"></i>
+            </a>
+
+          </td>
+        </tr>
+        {% endfor %}
+        <tr class="{% if cart_list %}d-none{% endif %} empty">
+          <td colspan='6' class="fs-3 text-center py-5">Your cart is empty</td>
+        </tr>
+        <tr class="{% if cart_list %}d-none{% endif %} empty">
+          <td colspan="6">
+            <a class='btn btn-primary float-end' href='/'>Continue shopping</a>
+          </td>
+        </tr>
+        <tr class="{% if not cart_list %}d-none{% endif %} non-empty">
+          <td colspan="5" class="text-end"><b>Order Total</b></td>
+          <td><b>৳<span id="total">{{ total }}</span></b></td>
+        </tr>
+        <tr class="{% if not cart_list %}d-none{% endif %} non-empty">
+          <td colspan="6">
+            <a class='btn btn-warning float-end ms-2' id="checkoutBtn" href='{% url "orders:checkout" %}'>Proceed
+              to
+              checkout</a>
+            <a class='btn btn-primary float-end' href='{% url "products:list" %}'>Continue shopping</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock body %}
+
+{% block script %}
+<script>
+  let plus = document.querySelectorAll('.fa-plus');
+  let minus = document.querySelectorAll('.fa-minus');
+  let trash = document.querySelectorAll('.fa-trash');
+  let total = document.getElementById('total');
+  let totalValue = parseInt(total.innerHTML);
+  let empty = document.querySelectorAll('.empty');
+  let non_empty = document.querySelectorAll('.non-empty');
+  let allCheck = document.getElementById('allCheck');
+  let check = document.querySelectorAll('.check');
+  let checkoutBtn = document.getElementById('checkoutBtn');
+
+  check.forEach((item) => {
+    item.checked = true;
+  });
+
+  plus.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      let url = e.target.parentElement.href;
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (data.added) {
+            total.innerHTML = data.total_price;
+            e.target.parentElement.previousElementSibling.innerHTML = data.quantity;
+            e.target.parentElement.parentElement.nextElementSibling.firstElementChild.innerHTML = data.total;
+            totalValue = data.total_price;
+            if (data.has_discount) {
+              e.target.parentElement.parentElement.nextElementSibling.childNodes[3].innerHTML = `Saving ৳${data.amount_saved}`;
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  });
+
+  minus.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      let url = e.target.parentElement.href;
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (data.deleted) {
+            e.target.parentElement.parentElement.parentElement.remove();
+            totalValue -= data.total;
+            total.innerHTML = totalValue;
+          } else {
+            if (data.removed) {
+              total.innerHTML = data.total_price;
+              e.target.parentElement.nextElementSibling.innerHTML = data.quantity;
+              e.target.parentElement.parentElement.nextElementSibling.firstElementChild.innerHTML = data.total;
+              totalValue = data.total_price;
+              if (data.has_discount) {
+                e.target.parentElement.parentElement.nextElementSibling.childNodes[3].innerHTML = `Saving ৳${data.amount_saved}`;
+              }
+            }
+
+          }
+          if (totalValue <= 0) {
+            empty.forEach((item) => {
+              item.classList.remove('d-none');
+              allCheck.checked = false;
+            });
+            non_empty.forEach((item) => {
+              item.classList.add('d-none');
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  });
+
+  trash.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      let url = e.target.parentElement.href;
+      fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          if (data.total <= 0) {
+            empty.forEach((item) => {
+              item.classList.remove('d-none');
+            });
+            non_empty.forEach((item) => {
+              item.classList.add('d-none');
+            });
+          }
+          if (data.deleted) {
+            e.target.parentElement.parentElement.parentElement.remove();
+            total.innerHTML = data.total;
+            totalValue = data.total;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  });
+
+  allCheck.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      checkoutBtn.classList.remove('disabled');
+    } else {
+      checkoutBtn.classList.add('disabled');
+    }
+    check.forEach((item) => {
+      item.checked = e.target.checked;
+      if (item.checked) {
+        total.innerHTML = totalValue;
+      } else {
+        total.innerHTML = 0;
+      }
+    });
+  });
+
+  check.forEach((item) => {
+    item.addEventListener('change', (e) => {
+      let temptotalValue = parseInt(0);
+      check.forEach((item) => {
+        if (item.checked) {
+          temptotalValue += parseInt(item.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.firstElementChild.innerHTML);
+        }
+      });
+      total.innerHTML = temptotalValue;
+      if (temptotalValue == totalValue) {
+        allCheck.checked = true;
+      } else {
+        allCheck.checked = false;
+      }
+      if (temptotalValue > 0) {
+        checkoutBtn.classList.remove('disabled');
+      } else {
+        checkoutBtn.classList.add('disabled');
+      }
+    });
+  });
+
+  checkoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    check.forEach((item) => {
+      if (!item.checked) {
+        let url = item.previousElementSibling.href;
+        console.log(url);
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    });
+
+    let checkoutUrl = e.target.href;
+    fetch(checkoutUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        'cartCheckout': true
+      }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.checkout) {
+          window.location.href = data.url;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+
+</script>
+{% endblock script %}

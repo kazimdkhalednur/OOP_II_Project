@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<main class="mt-5 pt-2">
+    <div class="container">
+        <div class="row">
+            <div id="carouselExampleInterval" class="carousel slide col-md-6 mb-4" data-mdb-ride="carousel"
+                data-mdb-carousel-init style="height: 70vh;">
+                <div class="carousel-inner ">
+                    {% for product_img in product.images.all %}
+                    <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}"
+                        data-mdb-interval="{% if forloop.counter == 1 %}10000{% elif forloop.last %}{% else %}2000{% endif %}">
+                        <div class="d-flex justify-content-center align-items-center ">
+                            <img src="{{product_img.image.url}}" class="img-fluid w-auto h-auto" alt="Wild Landscape" />
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" data-mdb-target="#carouselExampleInterval" type="button"
+                    data-mdb-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="color: black;"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" data-mdb-target="#carouselExampleInterval" type="button"
+                    data-mdb-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="color: black;"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="p-4">
+                    <div class="mb-3">
+                        <a href="">
+                            <span class="badge bg-dark me-1">{{ product.category }}</span>
+                        </a>
+                        <a href="">
+                            <span class="badge bg-info me-1">New</span>
+                        </a>
+                        <a href="">
+                            <span class="badge bg-danger me-1">Bestseller</span>
+                        </a>
+                    </div>
+
+                    <p class="lead">
+                        {% if product.has_discount %}
+                        <span class="me-1 text-danger">
+                            <del>৳{{ product.discount_price }}</del>
+                        </span>
+                        <span>৳{{ product.price }}</span>
+                        {% else %}
+                        <span>৳{{ product.price }}</span>
+                        {% endif %}
+                    </p>
+                    <strong>
+                        <p style="font-size: 20px;">{{ product.title }}</p>
+                    </strong>
+                    <form class="d-flex justify-content-left" style="margin-top: 100px;" method="post">
+                        {% csrf_token %}
+                        {{ form.product_slug }}
+                        <div>
+                            <div class="d-flex flex-row mb-3">
+                                <div class="flex-item me-3">Quantity</div>
+                                <div class="d-flex flex-row">
+                                    <button class="me-2 px-2 addBtn" id="addQuantity">+</button>
+                                    <div>
+                                        {{ form.quantity }}
+                                    </div>
+                                    <button class="ms-2 rmBtn" id="removeQuantity" style="padding: 0 .65rem;">-</button>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary ms-1" type="submit" name="add_cart">
+                                    Add to cart
+                                    <i class="fas fa-shopping-cart ms-1"></i>
+                                </button>
+                                <button class="btn btn-info ms-1" type="submit" name="buy_now">
+                                    Buy Now
+                                    <i class="fas fa-shopping-cart ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- <strong>
+                        <p style="font-size: 15px; margin-bottom: 1px; margin-top: 20px;">Description</p>
+                    </strong>
+
+                    <p>{{ product.description|safe }}</p> -->
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6 text-center">
+                <h4 class="my-4 h4">Additional information</h4>
+
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus suscipit modi sapiente illo soluta
+                    odit voluptates, quibusdam officia. Neque quibusdam quas a quis porro? Molestias illo neque eum in
+                    laborum.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-12 mb-4">
+                <img src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/11.jpg" class="img-fluid"
+                    alt="" />
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <img src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/12.jpg" class="img-fluid"
+                    alt="" />
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <img src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/13.jpg" class="img-fluid"
+                    alt="" />
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock body %}
+
+{% block script %}
+<script>
+    let addQuantity = document.getElementById("addQuantity");
+    let removeQuantity = document.getElementById("removeQuantity");
+    let quantity = document.getElementById("id_quantity");
+    addQuantity.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (quantity.value < 5) {
+            removeQuantity.disabled = false;
+            removeQuantity.classList.remove("disabled-cursor");
+            quantity.value = parseInt(quantity.value) + 1;
+        } else {
+            addQuantity.disabled = true
+            addQuantity.classList.add("disabled-cursor");
+        }
+    })
+    removeQuantity.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (quantity.value > 1) {
+            addQuantity.disabled = false;
+            addQuantity.classList.remove("disabled-cursor");
+            quantity.value = parseInt(quantity.value) - 1;
+        } else {
+            removeQuantity.disabled = true;
+            removeQuantity.classList.add("disabled-cursor");
+        }
+    })
+</script>
+{% endblock script %}

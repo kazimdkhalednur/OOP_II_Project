@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # my app
+    "accounts.apps.AccountsConfig",
+    "products.apps.ProductsConfig",
+    "orders.apps.OrdersConfig",
+    # third party
+    "tinymce",
 ]
 
 MIDDLEWARE = [
@@ -56,7 +62,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -86,6 +92,10 @@ DATABASES = {
     }
 }
 
+
+AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "/"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -131,3 +141,18 @@ MEDIA_ROOT = BASE_DIR / "uploads"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# SSLCommerz Configuration
+SSLCOMMERZ_STORE_ID = config("SSLCOMMERZ_STORE_ID", cast=str)
+SSLCOMMERZ_STORE_PASSWD = config("SSLCOMMERZ_STORE_PASSWD", cast=str)
+SSLCOMMERZ_SESSION_API = config("SSLCOMMERZ_SESSION_API", cast=str)
+SSLCOMMERZ_ORDER_VALIDATION_API = config("SSLCOMMERZ_ORDER_VALIDATION_API", cast=str)
+
+
+# import local_settings.py
+if DEBUG:
+    try:
+        from .local_settings import *  # noqa: F401, F403
+    except ImportError:
+        pass

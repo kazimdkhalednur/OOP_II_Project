@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<main class="mt-5">
+    <div class="container">
+        <h2 class="my-5 text-center">Checkout Form</h2>
+        <div class="row">
+            <div class="col-md-8 mb-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card p-4">
+                        <form>
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <input type="text" id="form6Example1" class="form-control"
+                                            value="{{ request.user.first_name}}" disabled />
+                                        <label class="form-label" for="form6Example1">First name</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <input type="text" id="form6Example2" class="form-control"
+                                            value="{{ request.user.last_name}}" disabled />
+                                        <label class="form-label" for="form6Example2">Last name</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="number" id="form6Example6" class="form-control" placeholder="01XXX-XXXXXX"
+                                    value="{{ request.user.phone_number}}" disabled />
+                                <label class="form-label" for="form6Example6">Phone Number</label>
+                            </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="email" id="form6Example5" class="form-control"
+                                    placeholder="email@example.com" value="{{ request.user.email }}" disabled />
+                                <label class="form-label disabled" for="form6Example5">Email</label>
+                            </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                {{ form.address }}
+                                <label class="form-label" for="{{ form.address.id_for_label}}">Address</label>
+                            </div>
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                {{ form.address_2 }}
+                                <label class="form-label" for="{{ form.address.id_for_label}}">Address 2
+                                    (optional)</label>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-2">
+                                    <div data-mdb-input-init class="form-outline">
+                                        {{ form.postal_code }}
+                                        <label class="form-label" for="{{ form.address.id_for_label}}">Postal
+                                            Code</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <div data-mdb-input-init class="form-outline">
+                                        {{ form.district }}
+                                        <label class="form-label" for="{{ form.address.id_for_label}}">District</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mb-5" />
+                            <div class="form-check mb-4">
+                                {{ form.save_address }}
+                                <label class="form-check-label" for="{{ form.save_address.id_for_label }}">Save this
+                                    information for next
+                                    time</label>
+                            </div>
+                            <button data-mdb-ripple-init type="submit" class="btn btn-primary btn-block mb-4">Place
+                                order</button>
+                        </form>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Your cart</span>
+                    <span class="badge rounded-pill badge-primary" id="checkoutCartCount">{{ cart_list|length }}</span>
+                </h4>
+                <ul class="list-group mb-3">
+                    {% for cart in cart_list %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <h6 class="my-0">{{ cart.product.title }}</h6>
+                        </div>
+                        <span class="text-muted cart-total">৳{{ cart.get_total }}</span>
+                    </li>
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Total (Taka)</span>
+                        <strong id="checkoutCartTotal"></strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock body %}
+
+
+{% block script %}
+
+<script>
+    let cartTotal = document.querySelectorAll('.cart-total');
+    let checkoutCartTotal = document.getElementById('checkoutCartTotal');
+    let total = parseInt(0);
+
+    cartTotal.forEach((item) => {
+        total += parseInt(item.innerText.split('৳')[1]);
+        checkoutCartTotal.innerHTML = `৳${total}`;
+    });
+
+</script>
+
+{% endblock script %}

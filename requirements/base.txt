@@ -1,2 +1,6 @@
 Django==5.0.4
+django-tinymce==4.0.0
+pillow==10.3.0
 python-decouple==3.8
+psycopg2==2.9.9
+requests==2.31.0

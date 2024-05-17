@@ -1,0 +1,45 @@
+{% load static %}
+{% load cart_template_tags %}
+
+<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-white">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarSupportedContent1"
+      aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent1">
+      <a class="navbar-brand mt-2 mt-sm-0" href="{% url 'products:list' %}">
+        <img src="{% static 'img/logo.png' %}" height="30" alt="E-Shop Logo" loading="lazy" />
+      </a>
+    </div>
+
+    <ul class="navbar-nav nav-flex-icons">
+      {% if request.user.is_authenticated %}
+      <li class="nav-item me-3">
+        <a href="{% url 'products:carts' %}" class="nav-link waves-effect">
+          <span class="clearfix d-none d-sm-inline-block"> Cart </span>
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge rounded-pill badge-notification bg-danger" id="cartCount">{{ request.user|cart_count }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link waves-effect" href="{% url 'accounts:logout' %}">
+          <span class="clearfix d-none d-sm-inline-block"> Logout </span>
+        </a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link waves-effect" href="{% url 'accounts:login' %}">
+          <span class="clearfix d-none d-sm-inline-block"> Login </span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link waves-effect" href="{% url 'accounts:signup' %}">
+          <span class="clearfix d-none d-sm-inline-block"> Signup </span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+
+<main>
+  <div id="" class="">
+    <div class="d-flex align-items-center">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-xl-6 col-md-8">
+            <div class="text-center fs-3 mb-4 fw-bold mt-5">Create your E-Shop Account</div>
+            <form class="bg-white rounded shadow-5-strong p-5" method="post">
+              {% csrf_token %}
+              <div class="row mb-4">
+                <div class="col">
+                  <div data-mdb-input-init class="form-outline">
+                    {{ form.first_name }}
+                    <label class="form-label" for="{{ form.first_name.id_for_label }}">First name</label>
+                  </div>
+                </div>
+                <div class="col">
+                  <div data-mdb-input-init class="form-outline">
+                    {{ form.last_name }}
+                    <label class="form-label" for="{{ form.last_name.id_for_label }}">Last name</label>
+                  </div>
+                </div>
+              </div>
+              <div data-mdb-input-init class="form-outline mb-4">
+                {{ form.phone_number }}
+                <label class="form-label" for="{{ form.phone_number.id_for_label }}">Phone number</label>
+              </div>
+              <div data-mdb-input-init class="form-outline mb-4">
+                {{ form.email }}
+                <label class="form-label" for="{{ form.email.id_for_label }}">Email address</label>
+              </div>
+              <div data-mdb-input-init class="form-outline mb-4">
+                {{ form.password1 }}
+                <label class="form-label" for="{{ form.password1.id_for_label }}">New Password</label>
+              </div>
+              <div data-mdb-input-init class="form-outline mb-4">
+                {{ form.password2 }}
+                <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+              </div>
+              <button data-mdb-ripple-init type="submit" class="btn btn-primary btn-block mb-4">Sign up</button>
+              <div class="text-center">
+                <p>or sign up with:</p>
+                <button data-mdb-ripple-init type="button" class="btn btn-secondary btn-floating mx-1">
+                  <i class="fab fa-facebook-f"></i>
+                </button>
+                <button data-mdb-ripple-init type="button" class="btn btn-secondary btn-floating mx-1">
+                  <i class="fab fa-google"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock body %}
