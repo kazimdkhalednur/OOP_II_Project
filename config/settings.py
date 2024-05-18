@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "orders.apps.OrdersConfig",
     # third party
     "tinymce",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -149,6 +150,19 @@ SSLCOMMERZ_STORE_PASSWD = config("SSLCOMMERZ_STORE_PASSWD", cast=str)
 SSLCOMMERZ_SESSION_API = config("SSLCOMMERZ_SESSION_API", cast=str)
 SSLCOMMERZ_ORDER_VALIDATION_API = config("SSLCOMMERZ_ORDER_VALIDATION_API", cast=str)
 
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+# AWS configuration
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="oop2")
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
+AWS_S3_SIGNATURE_VERSION = config("AWS_S3_SIGNATURE_VERSION", default="s3v4")
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_FILE_OVERWRITE = config("AWS_S3_FILE_OVERWRITE", cast=bool, default=False)
+AWS_DEFAULT_ACL = config("AWS_DEFAULT_ACL", default=None)
+AWS_S3_VERIFY = config("AWS_S3_VERIFY", cast=bool, default=True)
 
 # import local_settings.py
 if DEBUG:
