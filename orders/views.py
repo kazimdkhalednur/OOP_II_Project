@@ -9,14 +9,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, View
+from django.views.generic import FormView, ListView, View
 
 from accounts.models import Information
 from products.models import Cart
 from utils import SSLCommerz
 
 from .forms import OrderForm
-from .models import OrderItem, Transaction
+from .models import Order, OrderItem, Transaction
 
 
 class CheckoutView(LoginRequiredMixin, FormView):
@@ -133,35 +133,47 @@ class OrderInstantPaymentNotificationView(View):
             transaction.val_id = payment_data["val_id"]
             transaction.store_amount = payment_data["store_amount"]
             transaction.bank_tran_id = payment_data["bank_tran_id"]
-            transaction.save()
+            transaction.is_paid = True
+            transaction.save(
+                update_fields=[
+                    "tran_date",
+                    "status",
+                    "val_id",
+                    "store_amount",
+                    "bank_tran_id",
+                    "is_paid",
+                ]
+            )
+            transaction.order.status = Order.OrderStatus.PAID
+            transaction.order.save(update_fields=["status"])
             messages.success(request, "Order has been placed successfully.")
             return redirect("products:list")
 
         elif payment_data["status"] == "FAILED":
             transaction = get_object_or_404(Transaction, id=payment_data["tran_id"])
             transaction.status = payment_data["status"]
-            transaction.save()
+            transaction.save(update_fields=["status"])
             messages.warning(request, "Order has been failed.")
             return redirect("products:list")
 
         elif payment_data["status"] == "CANCELLED":
             transaction = get_object_or_404(Transaction, id=payment_data["tran_id"])
             transaction.status = payment_data["status"]
-            transaction.save()
+            transaction.save(update_fields=["status"])
             messages.warning(request, "Order has been canceled by you.")
             return redirect("products:list")
 
         elif payment_data["status"] == "UNATTEMPTED":
             transaction = get_object_or_404(Transaction, id=payment_data["tran_id"])
             transaction.status = payment_data["status"]
-            transaction.save()
+            transaction.save(update_fields=["status"])
             messages.warning(request, "Order has been unattempted.")
             return redirect("products:list")
 
         elif payment_data["status"] == "EXPIRED":
             transaction = get_object_or_404(Transaction, id=payment_data["tran_id"])
             transaction.status = payment_data["status"]
-            transaction.save()
+            transaction.save(update_fields=["status"])
             messages.warning(request, "Order has been expired.")
             return redirect("products:list")
 
@@ -172,3 +184,13 @@ class OrderVerifyView(View):
         transaction = Transaction.objects.get(id=data["tran_id"])
         if transaction.check_valid_transaction():
             return
+
+
+class MyOrderView(LoginRequiredMixin, ListView):
+    template_name = "orders/my_order.html"
+    context_object_name = "order_list"
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).exclude(
+            status=Order.OrderStatus.PENDING
+        )

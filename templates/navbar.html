@@ -17,6 +17,11 @@
     <ul class="navbar-nav nav-flex-icons">
       {% if request.user.is_authenticated %}
       <li class="nav-item me-3">
+        <a href="{% url 'orders:my_order' %}" class="nav-link waves-effect">
+          My Order
+        </a>
+      </li>
+      <li class="nav-item me-3">
         <a href="{% url 'products:carts' %}" class="nav-link waves-effect">
           <span class="clearfix d-none d-sm-inline-block"> Cart </span>
           <i class="fas fa-shopping-cart"></i>

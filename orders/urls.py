@@ -6,4 +6,5 @@ app_name = "orders"
 urlpatterns = [
     path("checkout/", views.CheckoutView.as_view(), name="checkout"),
     path("ipn/", views.OrderInstantPaymentNotificationView.as_view(), name="ipn"),
+    path("my/", views.MyOrderView.as_view(), name="my_order"),
 ]

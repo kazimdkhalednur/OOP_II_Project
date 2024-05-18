@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container mt-4" style="min-height: 70vh;">
+  <div class="table-responsive text-nowrap">
+    <div class="mb-4 fs-2 fw-bold">My Order Summary</div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 1vw;">#</th>
+          <th scope="col" style="width: 30vw;">Title</th>
+          <th scope="col" style="width: 10vw;">Price</th>
+          <th scope="col" style="width: 10vw;">Quantity</th>
+          <th scope="col" style="width: 10vw;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in order_list %}
+        {% for item in order.items.all %}
+        {% if item.product %}
+        <tr>
+          {% if forloop.counter == 1 %}
+          <td rowspan="{{order.items.all|length}}">{{ order.id }}</td>
+          {% endif %}
+          <td><a href="{{ item.product.get_url }}">{{ item.product.title }}</a></td>
+          <td>৳{{ item.product.price }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ order.status }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+        
+        
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock body %}

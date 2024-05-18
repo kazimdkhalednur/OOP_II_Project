@@ -7,6 +7,7 @@ __pycache__
 media
 local_settings.py
 static
+uploads
 
 # Backup files # 
 *.bak 

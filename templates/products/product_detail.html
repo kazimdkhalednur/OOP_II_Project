@@ -6,13 +6,13 @@
     <div class="container">
         <div class="row">
             <div id="carouselExampleInterval" class="carousel slide col-md-6 mb-4" data-mdb-ride="carousel"
-                data-mdb-carousel-init style="height: 70vh;">
+                data-mdb-carousel-init style="height: 100vh;">
                 <div class="carousel-inner ">
                     {% for product_img in product.images.all %}
                     <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}"
                         data-mdb-interval="{% if forloop.counter == 1 %}10000{% elif forloop.last %}{% else %}2000{% endif %}">
                         <div class="d-flex justify-content-center align-items-center ">
-                            <img src="{{product_img.image.url}}" class="img-fluid w-auto h-auto" alt="Wild Landscape" />
+                            <img src="{{product_img.image.url}}" class="img-fluid " alt="Wild Landscape" style="width: 400px; height: 100%;" />
                         </div>
                     </div>
                     {% endfor %}
