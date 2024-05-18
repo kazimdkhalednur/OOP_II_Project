@@ -61,7 +61,7 @@ class Product(models.Model):
         return self.title
 
     def clean(self):
-        if self.discount_price < self.price:
+        if self.discount_price < self.price and self.price:
             raise ValidationError({"price": "Discount price must be less than price"})
 
     def save(self, *args, **kwargs) -> None:
